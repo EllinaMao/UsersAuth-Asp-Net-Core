@@ -31,7 +31,7 @@ public class AccountController : Controller
             {
                 // установка куки
                 await _signInManager.SignInAsync(user, false);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Notes");
             }
             else
             {
@@ -67,7 +67,7 @@ public class AccountController : Controller
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Notes");
                 }
             }
             else

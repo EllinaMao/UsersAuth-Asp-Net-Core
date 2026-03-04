@@ -1,4 +1,5 @@
-﻿using WebApplication1.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
 using WebApplication1.Models;
 
 namespace WebApplication1.Repositories
@@ -14,31 +15,48 @@ namespace WebApplication1.Repositories
 
     public class NoteRepository: INoteRepository
     {
-        private ApplicationContext _context;
+        private readonly ApplicationContext _context;
 
-        public Task AddNoteAsync(Note note)
+        public NoteRepository(ApplicationContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task DeleteNoteAsync(int id)
+        public async Task<IEnumerable<Note>> GetNotesByUserIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            return await _context.Notes
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.Id)
+                .ToListAsync();
         }
 
-        public Task<Note> GetNoteByIdAsync(int id)
+        public async Task<Note> GetNoteByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Notes
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public Task<IEnumerable<Note>> GetNotesByUserIdAsync(string userId)
+        public async Task AddNoteAsync(Note note)
         {
-            throw new NotImplementedException();
+            await _context.Notes.AddAsync(note);
+            await _context.SaveChangesAsync();
         }
 
-        public Task UpdateNoteAsync(Note note)
+        public async Task UpdateNoteAsync(Note note)
         {
-            throw new NotImplementedException();
+            _context.Notes.Update(note);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteNoteAsync(int id)
+        {
+            var note = await _context.Notes.FindAsync(id);
+            if (note != null)
+            {
+                _context.Notes.Remove(note);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

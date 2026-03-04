@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Models;
+using WebApplication1.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IAuthorizationHandler, IsRecipeOwnerHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, IsNoteOwnerHandler>();
+
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 
 builder.Services.AddAuthorization(options => {
@@ -103,17 +107,18 @@ using (var scope = app.Services.CreateScope())
 
         var applicationContext = services.GetRequiredService<ApplicationContext>();
 
-        //applicationContext.Database.EnsureDeleted();
+        applicationContext.Database.EnsureDeleted();
 
-        applicationContext.Database.EnsureCreated();
+      applicationContext.Database.EnsureCreated();
 
         var userManager = services.GetRequiredService<UserManager<User>>();
 
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
+            
         await RoleInitializer.InitializeAsync(userManager, rolesManager);
 
         await RecipeInitializer.InitializeAsync(applicationContext);
+        await NotesInitializer.InitializeAsync(applicationContext);
 
     }
 

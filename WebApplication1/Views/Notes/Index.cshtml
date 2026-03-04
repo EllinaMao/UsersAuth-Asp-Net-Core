@@ -1,0 +1,52 @@
+@model IEnumerable<WebApplication1.Models.Note>
+
+@{
+    ViewData["Title"] = "Мои заметки";
+}
+
+<h1>Мои заметки</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Создать новую заметку</a>
+</p>
+
+@if (Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Описание
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редактировать</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Просмотр</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Удалить</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        <p>У вас пока нет заметок. <a asp-action="Create">Создайте первую заметку!</a></p>
+    </div>
+}
