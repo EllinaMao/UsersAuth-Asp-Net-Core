@@ -15,13 +15,18 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IAuthorizationHandler, IsRecipeOwnerHandler>();
 
+
 builder.Services.AddAuthorization(options => {
 
     options.AddPolicy("CanManageRecipe", policyBuilder =>
 
     policyBuilder.AddRequirements(new IsRecipeOwnerRequirement()));
 
+    options.AddPolicy("CanManageNote", policyBuilder =>
+    policyBuilder.AddRequirements(new IsNoteOwnerRequirement()));
+
 });
+
 
 IConfigurationRoot _confString = new ConfigurationBuilder().
 

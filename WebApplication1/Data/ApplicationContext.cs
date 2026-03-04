@@ -12,5 +12,6 @@ namespace WebApplication1.Data
            
         }
         public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Note> Notes { get; set; }
     }
 }
