@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
+using WebApplication1.Helpers;
 using WebApplication1.Models;
 
 
@@ -15,6 +16,11 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IAuthorizationHandler, IsRecipeOwnerHandler>();
 
+var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+
+builder.Services.AddScoped<EmailHelper>();
+
+builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddAuthorization(options => {
 
@@ -40,6 +46,10 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 
                options.UseSqlServer(_confString.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opts => opts.TokenLifespan = TimeSpan.FromHours(10));
+
+
 builder.Services.AddIdentity<User, IdentityRole>(opts =>
 
 {
@@ -53,8 +63,9 @@ builder.Services.AddIdentity<User, IdentityRole>(opts =>
     opts.Password.RequireUppercase = false;
 
     opts.Password.RequireDigit = false;
+    opts.SignIn.RequireConfirmedEmail = true;
 
-}).AddEntityFrameworkStores<ApplicationContext>();
+}).AddEntityFrameworkStores<ApplicationContext>().AddDefaultTokenProviders();
 
 
 var app = builder.Build();
