@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Helpers;
 using WebApplication1.Models;
+using WebApplication1.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
