@@ -9,6 +9,8 @@ namespace WebApplication1.Data
         {
             string adminEmail = "admin@gmail.com", adminPassword = "qwerty";
             string userEmail = "user@gmail.com", userPassword = "qwerty";
+            
+            
 
             if (await roleManager.FindByNameAsync("Admin") == null)
             {
@@ -17,6 +19,10 @@ namespace WebApplication1.Data
             if (await roleManager.FindByNameAsync("RegisteredUser") == null)
             {
                 await roleManager.CreateAsync(new IdentityRole("RegisteredUser"));
+            }
+            if (await roleManager.FindByNameAsync("Moderator") == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole("Moderator"));
             }
             if (await userManager.FindByNameAsync(adminEmail) == null)
             {

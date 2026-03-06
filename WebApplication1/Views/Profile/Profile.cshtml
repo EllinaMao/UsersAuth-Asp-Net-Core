@@ -1,0 +1,138 @@
+﻿@model WebApplication1.ViewModels.Profile.ProfileViewModel
+
+@{
+    ViewData["Title"] = Model.IsOwnProfile ? "Мой профиль" : $"Профиль {Model.Email}";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>@(Model.IsOwnProfile ? "Мой профиль" : "Профиль пользователя")</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Email:</strong> @Model.Email
+                    </div>
+                    <div class="mb-3">
+                        <strong>Год:</strong> @Model.Year
+                    </div>
+
+                    @if (!Model.IsOwnProfile)
+                    {
+                        <div class="mt-3">
+                            @if (Model.IsFriend)
+                            {
+                                <form asp-action="RemoveFriend" method="post" class="d-inline">
+                                    <input type="hidden" name="friendId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-danger">Удалить из друзей</button>
+                                </form>
+                            }
+                            else if (Model.HasPendingRequest)
+                            {
+                                <form asp-action="CancelFriendRequest" method="post" class="d-inline">
+                                    <input type="hidden" name="friendId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-warning">Отменить запрос</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="SendFriendRequest" method="post" class="d-inline">
+                                    <input type="hidden" name="friendId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-primary">Добавить в друзья</button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Friends.Any())
+            {
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h4>Друзья (@Model.Friends.Count)</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            @foreach (var friend in Model.Friends)
+                            {
+                                <a asp-action="Profile" asp-route-id="@friend.Id" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">@friend.UserName</h6>
+                                        <small>@friend.Year</small>
+                                    </div>
+                                    <small>@friend.Email</small>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.IsOwnProfile)
+        {
+            <div class="col-md-4">
+                @if (Model.PendingRequests.Any())
+                {
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5>Входящие запросы (@Model.PendingRequests.Count)</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                @foreach (var request in Model.PendingRequests)
+                                {
+                                    <div class="list-group-item">
+                                        <div class="mb-2">
+                                            <strong>@request.UserName</strong><br />
+                                            <small>@request.Email</small>
+                                        </div>
+                                        <div class="btn-group btn-group-sm w-100">
+                                            <form asp-action="AcceptFriendRequest" method="post" class="flex-fill">
+                                                <input type="hidden" name="friendId" value="@request.Id" />
+                                                <button type="submit" class="btn btn-success w-100">Принять</button>
+                                            </form>
+                                            <form asp-action="RejectFriendRequest" method="post" class="flex-fill ms-1">
+                                                <input type="hidden" name="friendId" value="@request.Id" />
+                                                <button type="submit" class="btn btn-danger w-100">Отклонить</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.SentRequests.Any())
+                {
+                    <div class="card">
+                        <div class="card-header bg-warning">
+                            <h5>Исходящие запросы (@Model.SentRequests.Count)</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                @foreach (var request in Model.SentRequests)
+                                {
+                                    <div class="list-group-item">
+                                        <div class="mb-2">
+                                            <strong>@request.UserName</strong><br />
+                                            <small>@request.Email</small>
+                                        </div>
+                                        <form asp-action="CancelFriendRequest" method="post">
+                                            <input type="hidden" name="friendId" value="@request.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">Отменить</button>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

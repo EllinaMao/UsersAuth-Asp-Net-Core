@@ -14,7 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+// Регистрация обработчиков авторизации
 builder.Services.AddScoped<IAuthorizationHandler, IsRecipeOwnerHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ViewRecipeHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, EditRecipeHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, DeleteRecipeHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, HideRecipeHandler>();
 
 var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
 
@@ -28,8 +33,18 @@ builder.Services.AddAuthorization(options => {
 
     policyBuilder.AddRequirements(new IsRecipeOwnerRequirement()));
 
-    options.AddPolicy("CanManageNote", policyBuilder =>
-    policyBuilder.AddRequirements(new IsNoteOwnerRequirement()));
+    // политики для работы с рецептами
+    options.AddPolicy(RecipeOperations.View, policyBuilder =>
+        policyBuilder.AddRequirements(new ViewRecipeRequirement()));
+
+    options.AddPolicy(RecipeOperations.Edit, policyBuilder =>
+        policyBuilder.AddRequirements(new EditRecipeRequirement()));
+
+    options.AddPolicy(RecipeOperations.Delete, policyBuilder =>
+        policyBuilder.AddRequirements(new DeleteRecipeRequirement()));
+
+    options.AddPolicy(RecipeOperations.Hide, policyBuilder =>
+        policyBuilder.AddRequirements(new HideRecipeRequirement()));
 
 });
 
@@ -114,15 +129,19 @@ using (var scope = app.Services.CreateScope())
 
         var applicationContext = services.GetRequiredService<ApplicationContext>();
 
-        //applicationContext.Database.EnsureDeleted();
+
+        applicationContext.Database.EnsureDeleted();
 
         applicationContext.Database.EnsureCreated();
+
 
         var userManager = services.GetRequiredService<UserManager<User>>();
 
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
         await RoleInitializer.InitializeAsync(userManager, rolesManager);
+
+        await RecipeVisibilitiesInitializer.InitializeAsync(applicationContext);
 
         await RecipeInitializer.InitializeAsync(applicationContext);
 

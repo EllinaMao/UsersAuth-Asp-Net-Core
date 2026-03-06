@@ -1,0 +1,54 @@
+@model List<WebApplication1.ViewModels.Profile.FriendViewModel>
+
+@{
+    ViewData["Title"] = "Поиск пользователей";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Поиск пользователей</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="SearchUsers" method="get" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" name="query" class="form-control" placeholder="Введите email или имя пользователя..." value="@Context.Request.Query["query"]" />
+                            <button type="submit" class="btn btn-primary">Искать</button>
+                        </div>
+                    </form>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <h4 class="mb-3">Результаты поиска:</h4>
+                        <div class="list-group">
+                            @foreach (var user in Model)
+                            {
+                                <a asp-action="Profile" asp-route-id="@user.Id" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@user.UserName</h5>
+                                        <small>Год: @user.Year</small>
+                                    </div>
+                                    <p class="mb-1">@user.Email</p>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else if (Context.Request.Query.ContainsKey("query"))
+                    {
+                        <div class="alert alert-info">
+                            Пользователи не найдены. Попробуйте изменить запрос.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary">
+                            Введите запрос для поиска пользователей.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
