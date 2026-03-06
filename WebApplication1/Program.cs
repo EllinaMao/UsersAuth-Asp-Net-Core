@@ -22,16 +22,23 @@ builder.Services.AddScoped<EmailHelper>();
 
 builder.Services.AddSingleton(emailConfig);
 
-builder.Services.AddAuthorization(options => {
+//builder.Services.AddAuthorization(options => {
 
-    options.AddPolicy("CanManageRecipe", policyBuilder =>
+//    options.AddPolicy("CanManageRecipe", policyBuilder =>
 
-    policyBuilder.AddRequirements(new IsRecipeOwnerRequirement()));
+//    policyBuilder.AddRequirements(new IsRecipeOwnerRequirement()));
 
-    options.AddPolicy("CanManageNote", policyBuilder =>
-    policyBuilder.AddRequirements(new IsNoteOwnerRequirement()));
+//    options.AddPolicy("CanManageNote", policyBuilder =>
+//    policyBuilder.AddRequirements(new IsNoteOwnerRequirement()));
 
-});
+//});
+
+builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = "643984453326-utsd7im8ldkp59uteupa2dvbe9t9t98s.apps.googleusercontent.com";
+                    options.ClientSecret = "643984453326-utsd7im8ldkp59uteupa2dvbe9t9t98s.apps.googleusercontent.com";
+                });
 
 
 IConfigurationRoot _confString = new ConfigurationBuilder().
