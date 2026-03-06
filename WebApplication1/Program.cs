@@ -33,11 +33,23 @@ builder.Services.AddSingleton(emailConfig);
 
 //});
 
+var clientId = builder.Configuration["Authentication:Google:ClientId"];
+if (string.IsNullOrEmpty(clientId))
+{
+    throw new Exception("ClientId не найден в конфигурации!");
+}
+var clientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+if (string.IsNullOrEmpty(clientId))
+{
+    throw new Exception("ClientId не найден в конфигурации!");
+}
+
+
 builder.Services.AddAuthentication()
                 .AddGoogle(options =>
                 {
-                    options.ClientId = "643984453326-utsd7im8ldkp59uteupa2dvbe9t9t98s.apps.googleusercontent.com";
-                    options.ClientSecret = "643984453326-utsd7im8ldkp59uteupa2dvbe9t9t98s.apps.googleusercontent.com";
+                    options.ClientId = clientId;
+                    options.ClientSecret = clientSecret;
                 });
 
 
